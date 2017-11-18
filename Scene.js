@@ -15,8 +15,8 @@ var cameraViewCar = 0;
 var elapsedTime;
 var timeCount = 0;
 var generationNumber = 0;
-var populationSize = 2;
-var layers = [3, 10, 10, 2];
+var populationSize = 20;
+var layers = [3, 10, 10, 3];
 var neuralNetworks;
 var mouse = new THREE.Vector2();
 var mouseWorld = new THREE.Vector3();
@@ -160,7 +160,7 @@ function animate() {
   }
 
   for(i = 0; i<objs.length; i++){
-    objs[i].update(elapsedTime, objs);
+    objs[i].update(elapsedTime, objs, scene);
   }
 
   render();
