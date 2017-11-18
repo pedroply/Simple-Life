@@ -3,20 +3,15 @@
 class NeuralNetwork{
 
   constructor(obj){
+    'use strict';
     var i;
 
     this.fitness = 0;
+    this.layers = new Array();
+    this.weights = new Array();
+    this.neurons = new Array();
 
     if(obj instanceof NeuralNetwork){
-      var layers = obj;
-      for(i = 0; i < layers.length; i++){
-        this.layers[i] = layers[i];
-      }
-
-      this.InitNeurons();
-      this.InitWeights();
-    }
-    else{
       var copyNetwork = obj;
       for(i = 0; i < copyNetwork.layers.length; i++){
         this.layers[i] = copyNetwork.layers[i];
@@ -26,9 +21,19 @@ class NeuralNetwork{
       this.InitWeights();
       this.CopyWeights(copyNetwork.weights);
     }
+    else{
+      var layers = obj;
+      for(i = 0; i < layers.length; i++){
+        this.layers[i] = layers[i];
+      }
+
+      this.InitNeurons();
+      this.InitWeights();
+    }
   }
 
   CopyWeights(copyWeights){
+    'use strict';
     var i, j, k;
     for(i = 0; i < this.weights.length; i++){
       for(j = 0; j < this.weights[i].length; j++){
@@ -40,22 +45,24 @@ class NeuralNetwork{
   }
 
   InitNeurons(){
+    'use strict';
     var i;
-    for(i = 0; i < this.layers.Length; i++){
-      this.neurons[this.neuronsList.length] = [this.layers[i]]
+    for(i = 0; i < this.layers.length; i++){
+      this.neurons[this.neurons.length] = new Array(this.layers[i]);
     }
   }
 
   InitWeights(){
+    'use strict';
     var i, j, k;
 
     for(i = 1; i < this.layers.length; i++){
-      var layerWeightsList = [];
+      var layerWeightsList = new Array();
       var neuronsInPreviousLayer = this.layers[i-1];
 
       for(j = 0; j < this.neurons[i].length; j++){
 
-        var neuronWeights;
+        var neuronWeights = new Array();
 
         for(k = 0; k < neuronsInPreviousLayer; k++){
           neuronWeights[k] = Math.random()-0.5;
@@ -71,6 +78,7 @@ class NeuralNetwork{
   }
 
   FeedForward(inputs){
+    'use strict';
     var i, j, k;
 
     for(i = 0; i < inputs.length; i++){
@@ -82,19 +90,20 @@ class NeuralNetwork{
         var value = 0;
 
         for(k = 0; k < this.neurons[i-1].length; k++){
-          value += this.weights[i-1][j][k] * neurons[i-1][k];
+          value += this.weights[i-1][j][k] * this.neurons[i-1][k];
         }
 
-        this.neurons[i][j] = Math.Tanh(value);
+        this.neurons[i][j] = Math.tanh(value);
 
       }
     }
 
-    return this.neurons[neurons.length-1];
+    return this.neurons[this.neurons.length-1];
 
   }
 
   Mutate(){
+    'use strict';
     var i, j, k;
 
     for(i = 0; i < this.weights.length; i++){
@@ -120,6 +129,7 @@ class NeuralNetwork{
   }
 
   CompareTo(obj){
+    'use strict';
     if(obj instanceof NeuralNetwork){
       if(this.fitness > obj.fitness){
         return 1;

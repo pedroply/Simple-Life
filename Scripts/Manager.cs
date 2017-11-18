@@ -47,9 +47,9 @@ public class Manager : MonoBehaviour {
                 }
             }
 
-           
+
             generationNumber++;
-            
+
             isTraning = true;
             Invoke("Timer",15f);
             CreateBoomerangBodies();
@@ -100,11 +100,11 @@ public class Manager : MonoBehaviour {
         //population must be even, just setting it to 20 incase it's not
         if (populationSize % 2 != 0)
         {
-            populationSize = 20; 
+            populationSize = 20;
         }
 
         nets = new List<NeuralNetwork>();
-        
+
 
         for (int i = 0; i < populationSize; i++)
         {
