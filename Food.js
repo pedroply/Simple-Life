@@ -2,11 +2,13 @@
 
 class Food{
 
-  constructor(){
+  constructor(x, y){
     'use strict'
     this.food = new THREE.Object3D();
     this.addMainBody();
     this.energy = 5;
+    this.food.position.x = x;
+    this.food.position.y = y;
   }
 
   addMainBody(){
@@ -22,7 +24,7 @@ class Food{
     geometry.computeFaceNormals();
     geometry.computeVertexNormals();
 
-    var mesh = new THREE.Mesh(geometry,  new THREE.MeshBasicMaterial( { color: 0x00ff00 } )*/);
+    var mesh = new THREE.Mesh(geometry,  new THREE.MeshBasicMaterial( { color: 0x00ff00 } ));
     mesh.rotation.set(0,0, 3*Math.PI/4);
     mesh.position.set(0.5,0,0);
     this.food.add(mesh);
@@ -37,6 +39,7 @@ class Food{
   eaten(obj){
     obj.eat(this.energy);
     this.energy = 0;
+    console.log("I got eaten!");
   }
 
   eat(energy){
@@ -44,11 +47,11 @@ class Food{
   }
 
   update(elapsedTime, objs, scene){
-    if(energy <= 0){
+    if(this.energy <= 0){
       scene.remove(this.food);
       var i;
       for(i = 0; i < objs.length; i++){
-        if(objs[i] = this){
+        if(objs[i] == this){
           objs.splice(i, 1);
           break;
         }

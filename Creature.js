@@ -14,6 +14,7 @@ class Creature{
     this.name = name;
     this.energy = 100;
     this._eat = 0;
+    this.ate = 0;
   }
 
   addMainBody(){
@@ -42,63 +43,64 @@ class Creature{
       scene.remove(this.creature);
       var i;
       for(i = 0; i < objs.length; i++){
-        if(objs[i] = this){
+        if(objs[i] == this){
           objs.splice(i, 1);
           break;
         }
       }
       console.log("im dead");
     }
+    else{
 
+      var inputs = new Array();
+      var i;
 
-    var inputs = new Array();
-    var i;
+      this.velocity[0] = this.absVelocity*Math.cos(this.creature.rotation.z);
+      this.velocity[1] = this.absVelocity*Math.sin(this.creature.rotation.z);
+      this.creature.position.x += this.velocity[0]*elapsedTime;
+      this.creature.position.y += this.velocity[1]*elapsedTime;
 
-    this.velocity[0] = this.absVelocity*Math.cos(this.creature.rotation.z);
-    this.velocity[1] = this.absVelocity*Math.sin(this.creature.rotation.z);
-    this.creature.position.x += this.velocity[0]*elapsedTime;
-    this.creature.position.y += this.velocity[1]*elapsedTime;
+      if(this._eat > 0.5)
+        this.energy -= 1;
 
-    var direction = new THREE.Vector3(this.velocity[0], this.velocity[1], 0);
-    direction.normalize();
+      var direction = new THREE.Vector3(this.velocity[0], this.velocity[1], 0);
+      direction.normalize();
 
-    for(i = 0; i < objs.length; i++){
-      var distance = this.creature.position.distanceTo(objs[i].getObject3D().position);
-      if(this != objs[i] && distance < 35){
-        var directionOther = new THREE.Vector3();
-        directionOther.subVectors( objs[i].getObject3D().position, this.creature.position);
-        directionOther.normalize();
-        if(directionOther.angleTo(direction) < Math.PI/3 || directionOther.angleTo(direction) > 5*Math.PI/3){
-          if(this._eat > 0.5){
-            this.energy -= 1;
-            if(distance < 5)
-              objs[i].eaten(this);
-            console.log("eating ");
+      for(i = 0; i < objs.length; i++){
+        var distance = this.creature.position.distanceTo(objs[i].getObject3D().position);
+        if(this != objs[i] && distance < 35){
+          var directionOther = new THREE.Vector3();
+          directionOther.subVectors( objs[i].getObject3D().position, this.creature.position);
+          directionOther.normalize();
+          if(directionOther.angleTo(direction) < Math.PI/3 || directionOther.angleTo(direction) > 5*Math.PI/3){
+            if(this._eat > 0.5 && distance < 5){
+                objs[i].eaten(this);
+                this.ate += 1;
+            }
+            else{ //alterar para o mais proximo ou meter break
+              inputs[0] = directionOther.angleTo(direction);
+              inputs[1] = distance;
+              inputs[2] = objs[i].getObject3D().children[0].material.color.r;
+              inputs[3] = this.energy;
+              break;
+            }
           }
           else{
-            inputs[0] = directionOther.angleTo(direction);
-            inputs[1] = distance;
-            inputs[2] = objs[i].getObject3D().children[0].material.color.r;
+            inputs[0] = -1;
+            inputs[1] = -1;
+            inputs[2] = -1;
+            inputs[3] = this.energy;
           }
         }
-        else{
-          inputs[0] = -1;
-          inputs[1] = -1;
-          inputs[2] = -1;
-        }
       }
+
+      this.neuralNetwork.fitness += this.energy*this.ate;
+
+      var outputs = this.neuralNetwork.FeedForward(inputs);
+      this.absVelocity = 10000 * outputs[0] * elapsedTime;
+      this.creature.rotation.z = outputs[1];
+      this._eat = outputs[2];
     }
-
-    /*inputs[0] = Math.sqrt(Math.pow(this.creature.position.x-40, 2) + Math.pow(this.creature.position.y-40, 2));
-    inputs[1] = this.creature.position.x-40;
-    inputs[2] = this.creature.position.y-40;*/
-
-    this.neuralNetwork.fitness += this.energy/100;
-
-    var outputs = this.neuralNetwork.FeedForward(inputs);
-    this.absVelocity = 10000 * outputs[0] * elapsedTime;
-    this.creature.rotation.z = outputs[1];
-    this._eat = outputs[2];
   }
 
   getObject3D(){
@@ -111,8 +113,8 @@ class Creature{
   }
 
   eaten(obj){
-    obj.eat(5);
-    this.energy -= 5;
+    /*obj.eat(5);
+    this.energy -= 5;*/
   }
 
 }

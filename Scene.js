@@ -14,9 +14,10 @@ var cameraViewCar = 0;
 
 var elapsedTime;
 var timeCount = 0;
+var foodTime = 0;
 var generationNumber = 0;
 var populationSize = 20;
-var layers = [3, 10, 10, 3];
+var layers = [4, 40, 20, 10, 3];
 var neuralNetworks;
 var mouse = new THREE.Vector2();
 var mouseWorld = new THREE.Vector3();
@@ -27,13 +28,17 @@ function createScene(){
   scene.add(new THREE.AxisHelper(10));
   InitCreaturesNeuralNetworks();
   CreateCreatures();
-  var geometry = new THREE.CircleGeometry( 5, 32 );
+  for(var i = 0; i < 20; i++){
+    objs[objs.length] = new Food((Math.random()-0.5)*80, (Math.random()-0.5)*80);
+    scene.add(objs[objs.length-1].getObject3D());
+  }
+  /*var geometry = new THREE.CircleGeometry( 5, 32 );
   var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
   var circle = new THREE.Mesh( geometry, material );
   circle.position.x = 40;
   circle.position.y = 40;
   circle.position.z = 0;
-  scene.add( circle );
+  scene.add( circle );*/
 }
 
 function createCamera(){
@@ -129,6 +134,7 @@ function animate() {
   var i;
   elapsedTime = clock.getDelta();
   timeCount += elapsedTime;
+  foodTime += elapsedTime;
   if(timeCount > 10){
 
     neuralNetworks.sort(function(a, b){
@@ -151,12 +157,24 @@ function animate() {
     for(i = 0; i < objs.length; i++){
       scene.remove(objs[i].getObject3D());
     }
+    objs = new Array();
     CreateCreatures();
+
+    for(i = 0; i < 20; i++){
+      objs[objs.length] = new Food((Math.random()-0.5)*80, (Math.random()-0.5)*80);
+      scene.add(objs[objs.length-1].getObject3D());
+    }
 
     generationNumber++;
     console.log("generation number: ", generationNumber);
     timeCount = 0;
     elapsedTime = clock.getDelta();
+  }
+
+  if(foodTime > 0.5){
+    objs[objs.length] = new Food((Math.random()-0.5)*80, (Math.random()-0.5)*80);
+    scene.add(objs[objs.length-1].getObject3D());
+    foodTime = 0;
   }
 
   for(i = 0; i<objs.length; i++){
@@ -225,7 +243,7 @@ function onMouseMove( event ) {
 
 	for ( var i = 0; i < intersects.length; i++ ) {
 
-		//intersects[ i ].object.material.color.set( 0xff0000 );
+		//console.log(intersects[ i ].object);
 
 	}
 
