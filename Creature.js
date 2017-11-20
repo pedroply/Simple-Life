@@ -15,6 +15,7 @@ class Creature{
     this.energy = 100;
     this._eat = 0;
     this.ate = 0;
+    this.bite = 0;
   }
 
   addMainBody(){
@@ -60,8 +61,10 @@ class Creature{
       this.creature.position.x += this.velocity[0]*elapsedTime;
       this.creature.position.y += this.velocity[1]*elapsedTime;
 
-      if(this._eat > 0.5)
-        this.energy -= 1;
+      if(this._eat > 0.5){
+        //this.energy -= 1;
+        this.bite += 1;
+      }
 
       var direction = new THREE.Vector3(this.velocity[0], this.velocity[1], 0);
       direction.normalize();
@@ -73,7 +76,7 @@ class Creature{
           directionOther.subVectors( objs[i].getObject3D().position, this.creature.position);
           directionOther.normalize();
           if(directionOther.angleTo(direction) < Math.PI/3 || directionOther.angleTo(direction) > 5*Math.PI/3){
-            if(this._eat > 0.5 && distance < 5){
+            if(this._eat > 0.5 && distance < 5 && objs[i] instanceof Food){
                 objs[i].eaten(this);
                 this.ate += 1;
             }
@@ -81,7 +84,6 @@ class Creature{
               inputs[0] = directionOther.angleTo(direction);
               inputs[1] = distance;
               inputs[2] = objs[i].getObject3D().children[0].material.color.r;
-              inputs[3] = this.energy;
               break;
             }
           }
@@ -89,12 +91,11 @@ class Creature{
             inputs[0] = -1;
             inputs[1] = -1;
             inputs[2] = -1;
-            inputs[3] = this.energy;
           }
         }
       }
 
-      this.neuralNetwork.fitness += this.energy*this.ate;
+      this.neuralNetwork.fitness = (this.ate*100000+1)/(this.bite+1) + this.bite;
 
       var outputs = this.neuralNetwork.FeedForward(inputs);
       this.absVelocity = 10000 * outputs[0] * elapsedTime;

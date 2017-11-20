@@ -17,7 +17,7 @@ var timeCount = 0;
 var foodTime = 0;
 var generationNumber = 0;
 var populationSize = 20;
-var layers = [4, 40, 20, 10, 3];
+var layers = [3, 10, 10, 3];
 var neuralNetworks;
 var mouse = new THREE.Vector2();
 var mouseWorld = new THREE.Vector3();
